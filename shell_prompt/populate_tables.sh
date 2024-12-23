@@ -1,7 +1,7 @@
 #!/bin/sh
 #export LD_LIBRARY_PATH=/usr/lib/oracle/12.1/client64/lib
 sqlplus64
-"a23zafar/07099589@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(Host=oracle12c.scs.ryerson.ca)
+"*****/*****@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(Host=oracle12c.scs.ryerson.ca)
 (Port=1521))(CONNECT_DATA=(SID=orcl12c)))" <<EOF
 
 INSERT INTO student (student_id, email_address, student_name, phone_number) VALUES (5167, 'ali@gmail.com', 'Alizeh Zafar', 111222333);
