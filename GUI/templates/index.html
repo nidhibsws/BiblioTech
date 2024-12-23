@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BiblioTech Database Management</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <h1>BiblioTech Database Management</h1>
+
+        <!--buttons for webpage-->
+        <button onclick="dropTables()">Drop Tables</button>
+        <button onclick="createTables()">Create Tables</button>
+        <button onclick="createView()">Create View</button>
+        <button onclick="populateTables()">Populate Tables</button>
+        <button onclick="queryTables()">Query Tables</button>
+        <button onclick="searchRecords()">Search Student</button>
+        <button onclick="deleteRecord(prompt('Enter ID to delete:'))">Delete Student</button>
+        <button onclick="updateEmail()">Update Email</button>
+
+        <div id="output"></div>
+
+
+        <!--drop/create/createView/populate/query table-->
+        <script>
+            function dropTables() {
+                fetch('/dropTables', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => document.getElementById('output').innerText = data.output);
+            }
+
+            function createTables() {
+                fetch('/createTables', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => document.getElementById('output').innerText = data.output);
+            }
+
+            function createView() {
+                fetch('/createView', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => document.getElementById('output').innerText = data.output);
+            }
+
+            function populateTables() {
+                fetch('/populateTables', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => document.getElementById('output').innerText = data.output);
+            }
+
+            function queryTables() {
+                fetch('/queryTables', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        const outputDiv = document.getElementById('output');
+                        if (data.status === 'success') {
+                            outputDiv.innerHTML = `
+                                <h2>Query Results</h2>
+                                <h3>Student Names:</h3>
+                                <ul>${data.student_names.map(name => `<li>${name}</li>`).join('')}</ul>
+
+                                <h3>Books by Author (Author ID 4325):</h3>
+                                <ul>${data.books_by_author.map(book => `<li>${book}</li>`).join('')}</ul>
+
+                                <h3>All Books:</h3>
+                                <ul>${data.all_books.map(book => `<li>${book}</li>`).join('')}</ul>
+
+                                <h3>Updated Student Info:</h3>
+                                <p>Email: ${data.updated_student_info.email}, Phone: ${data.updated_student_info.phone}</p>
+                            `;
+                        } 
+                    })
+            }
+
+
+            //newly added part for rubric
+            //find student id
+            function searchRecords() {
+                const searchTerm = prompt("Enter student ID:");
+                if (!searchTerm || isNaN(searchTerm)) {
+                    document.getElementById('output').innerText = "Invalid student ID.";
+                    return;
+                }
+
+                fetch(`/searchRecords?term=${searchTerm}`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const outputDiv = document.getElementById('output');
+                            outputDiv.innerHTML = `
+                                <h2>Search Results</h2>
+                                <h3>Student Details:</h3>
+                                <ul>${data.students.map(student => `
+                                    <li><strong>Name:</strong> ${student.name} <br> <strong>Email:</strong> ${student.email}</li>
+                                `).join('')}</ul>
+                            `;
+                        } else {
+                            document.getElementById('output').innerText = data.message || "No results found.";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching search records:", error);
+                        document.getElementById('output').innerText = "Failed to fetch search records.";
+                    });
+            }
+
+
+            //delete student
+            function deleteRecord(id) {
+                if (!id || isNaN(id)) {
+                    document.getElementById('output').innerText = "Invalid student ID.";
+                    return;
+                }
+
+                fetch(`/deleteRecord/${id}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('output').innerText = data.message || "Unknown response.";
+                    })
+                    .catch(error => {
+                        console.error("Error deleting record:", error);
+                        document.getElementById('output').innerText = "Failed to delete record.";
+                    });
+            }
+
+
+            //update email
+            function updateEmail() {
+                const studentId = prompt("Enter the student ID to update:");
+                if (!studentId || isNaN(studentId)) {
+                    document.getElementById('output').innerText = "Invalid student ID provided.";
+                    return;
+                }
+
+                const newEmail = prompt("Enter the new email address:");
+                if (!newEmail) {
+                    document.getElementById('output').innerText = "No email address provided.";
+                    return;
+                }
+
+                fetch(`/updateEmail/${studentId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: newEmail })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.getElementById('output').innerText = data.message;
+                        } else {
+                            document.getElementById('output').innerText = data.message || "Error occurred during update.";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error updating email:", error);
+                        document.getElementById('output').innerText = "Failed to update the email.";
+                    });
+            }
+
+
+
+
+        </script>
+    </body>
+</html>
