@@ -36,23 +36,3 @@ Frontend: HTML, CSS, JavaScript
 Shell Scripts: For UNIX-based database operations
 
 
-Installation
-Clone the repository:
-
-bash
-git clone https://github.com/yourusername/bibliotech.git  
-
-Set up the database:
-
-Use the provided SQL scripts to create and populate tables.
-Set up the backend:
-
-Install dependencies:
-bash
-pip install flask  
-
-Launch the application:
-
-bash
-python app.py  
-
